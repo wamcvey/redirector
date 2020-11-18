@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """A basic single purpose redirection server
 """
 from http.server import HTTPServer, BaseHTTPRequestHandler
