@@ -1,0 +1,26 @@
+# Redirect sas-alumni to new homepage  
+http:
+  routers:
+    alumni_router:
+      rule: Host(`sas-alumni.org`, `www.sas-alumni.org`)
+      entrypoints: web 
+      middlewares:
+        - alumni_redirect
+      service: service_sasbrats
+
+  middlewares:
+    alumni_redirect:
+      redirectRegex:
+        regex: "^..*"
+        replacement: "https://www.sasbrats.org/" 
+        permanent: "true" 
+
+
+  services:
+    service_sasbrats:
+      loadBalancer:
+        servers:
+        - url: https://wwww.sasbrats.org/?proxied
+        passHostHeader: false
+
+
