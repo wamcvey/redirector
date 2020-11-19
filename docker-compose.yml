@@ -1,0 +1,42 @@
+version: "3.3"
+
+services:
+
+  traefik:
+    image: "traefik:v2.3"
+    container_name: "traefik"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+      - "--log.level=DEBUG"
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  
+    # Note: all dollar signs need to be doubled for escaping.
+    labels:
+      - "traefik.enable=true"
+      # Redirect beta with domain replacement but keep the URL path
+      - "traefik.http.middlewares.beta_redirect.redirectregex.regex=^https?://beta.choosefi.com/(.*)"
+      - "traefik.http.middlewares.beta_redirect.redirectregex.replacement=https://www.choosefi.com/$${1}"
+      - "traefik.http.middlewares.beta_redirect.redirectregex.permanent=true"
+
+      - "traefik.http.routers.beta_router.rule=Host(`beta.choosefi.com`)"
+      - "traefik.http.routers.beta_router.entrypoints=web"
+      - "traefik.http.routers.beta_router.middlewares=beta_redirect"
+
+
+      # Redirect sas-alumni to new homepage 
+      - "traefik.http.middlewares.alumni_redirect.redirectregex.regex=^..*"
+      - "traefik.http.middlewares.alumni_redirect.redirectregex.replacement=https://www.sasbrats.org/"
+      - "traefik.http.middlewares.alumni_redirect.redirectregex.permanent=true"
+
+      - "traefik.http.routers.alumni_router.rule=Host(`sas-alumni.org`, `www.sas-alumni.org`)"
+      - "traefik.http.routers.alumni_router.entrypoints=web"
+      - "traefik.http.routers.alumni_router.middlewares=alumni_redirect"
+
+
+
+
